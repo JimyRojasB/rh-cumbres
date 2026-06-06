@@ -26,15 +26,21 @@ class DocumentoService:
                 detail="El archivo supera el límite de 10 MB.",
             )
 
-        return self.repo.upload(
-            trabajador_id=trabajador_id,
-            file_bytes=content,
-            filename=file.filename,
-            content_type=file.content_type,
-            tipo_documento=tipo_documento,
-            subido_por=user_id,
-            tamano=len(content),
-        )
+        try:
+            return self.repo.upload(
+                trabajador_id=trabajador_id,
+                file_bytes=content,
+                filename=file.filename,
+                content_type=file.content_type,
+                tipo_documento=tipo_documento,
+                subido_por=user_id,
+                tamano=len(content),
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(e),
+            )
 
     def list(self, trabajador_id: str) -> List[dict]:
         return self.repo.get_by_trabajador(trabajador_id)

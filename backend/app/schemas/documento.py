@@ -9,5 +9,5 @@ class DocumentoResponse(BaseModel):
     nombre_archivo: str
     tipo_documento: Optional[str]
     url_storage: str
-    tamaño_bytes: Optional[int] = None
+    tamano_bytes: Optional[int] = None
     uploaded_at: Optional[str]

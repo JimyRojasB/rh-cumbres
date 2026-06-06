@@ -23,9 +23,13 @@ class DocumentoRepository:
         ext = filename.rsplit(".", 1)[-1] if "." in filename else "pdf"
         path = f"{trabajador_id}/{uuid4()}.{ext}"
 
-        self.db.storage.from_(BUCKET).upload(
-            path, file_bytes, {"content-type": content_type, "upsert": "false"}
-        )
+        try:
+            self.db.storage.from_(BUCKET).upload(
+                path, file_bytes, {"content-type": content_type, "upsert": False}
+            )
+        except Exception as e:
+            raise Exception(f"Error en storage Supabase: {str(e)}")
+
         url = self.db.storage.from_(BUCKET).get_public_url(path)
 
         result = self.db.table("documentos").insert({
@@ -34,7 +38,7 @@ class DocumentoRepository:
             "nombre_archivo": filename,
             "tipo_documento": tipo_documento,
             "url_storage": url,
-            "tamaño_bytes": tamano,
+            "tamano_bytes": tamano,
         }).execute()
         return result.data[0]
 
