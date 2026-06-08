@@ -153,7 +153,6 @@ export default function WorkerPrint() {
           main { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
           body { margin: 0; background: white; }
           .ficha-wrap { padding: 5mm 7mm; max-width: 100% !important; box-shadow: none !important; }
-          .page-break { page-break-before: always; padding-top: 5mm; }
           @page { margin: 8mm; size: A4; }
         }
         .ficha-wrap { font-family: Arial, Helvetica, sans-serif; font-size: 8pt; }
@@ -423,81 +422,73 @@ export default function WorkerPrint() {
               </tr>
             ))}
 
-          </tbody>
-        </table>
-
-        {/* ════════════════════════════════════════════════════
-            FICHA — PÁGINA 2
-        ════════════════════════════════════════════════════ */}
-        <div className="page-break">
-          <table style={tbl}>
-            <tbody>
+          {/* ══ CONTINÚA: AFP, CONTACTOS, FIRMAS ══ */}
 
               {/* Encabezado NO APLICA */}
               <tr>
-                <Td colSpan={6} style={{ fontWeight: 'bold', fontSize: '8pt', backgroundColor: '#e8e8e8' }}>
+                <Td colSpan={8} style={{ fontWeight: 'bold', fontSize: '8pt', backgroundColor: '#e8e8e8' }}>
                   NO APLICA EN EL CASO DE PRACTICANTES
                 </Td>
               </tr>
 
               {/* Nombre del trabajador */}
               <tr>
-                <Td colSpan={3}>
+                <Td colSpan={4}>
                   <span style={lbl}>YO,</span>
                   <span style={{ ...val, fontSize: '9pt', fontWeight: 'bold' }}>
                     {worker.apellido_paterno} {worker.apellido_materno} {worker.nombres}
                   </span>
                 </Td>
-                <Td colSpan={3}>
+                <Td colSpan={4}>
                   <span style={lbl}>IDENTIFICADO CON DNI,</span>
                   <span style={{ ...val, fontSize: '9pt', fontWeight: 'bold' }}>{worker.dni}</span>
                 </Td>
               </tr>
               <tr>
-                <Td colSpan={6}>
+                <Td colSpan={8}>
                   <span style={lbl}>Y DOMICILIO EN,</span>
                   <span style={val}>{worker.domicilio} {worker.distrito} {worker.provincia}</span>
                 </Td>
               </tr>
 
               {/* AFP */}
-              <Hdr cols={6}>COMUNICO A USTEDES CONSTRUCTORA CUMBRES MONUMENTAL SAC LO SIGUIENTE:</Hdr>
+              <Hdr cols={8}>COMUNICO A USTEDES CONSTRUCTORA CUMBRES MONUMENTAL SAC LO SIGUIENTE:</Hdr>
 
               {afpOpts.map((opt, i) => (
                 <tr key={i}>
-                  <Td style={{ width: '5%', textAlign: 'center', fontSize: '7.5pt', color: '#555' }}>
+                  <Td style={{ width: '4%', textAlign: 'center', fontSize: '7.5pt', color: '#555' }}>
                     {i + 1}.-
                   </Td>
-                  <Td style={{ width: '12%', textAlign: 'center', verticalAlign: 'middle' }}>
+                  <Td style={{ width: '8%', textAlign: 'center', verticalAlign: 'middle' }}>
                     <Check checked={opt.leftCheck} />
                   </Td>
-                  <Td colSpan={2} style={{ fontSize: '8pt' }}>
+                  <Td colSpan={4} style={{ fontSize: '8pt' }}>
                     {opt.label}
                     {opt.extraLabel ? <strong> {opt.extraLabel.toUpperCase()}</strong> : ''}
                   </Td>
-                  <Td style={{ width: '12%', textAlign: 'center', fontWeight: 'bold', fontSize: '8pt' }}>
+                  <Td style={{ width: '10%', textAlign: 'center', fontWeight: 'bold', fontSize: '8pt' }}>
                     {opt.tag}
                   </Td>
-                  <Td style={{ width: '10%', textAlign: 'center', verticalAlign: 'middle' }}>
+                  <Td style={{ width: '8%', textAlign: 'center', verticalAlign: 'middle' }}>
                     <div style={{ width: '16px', height: '16px', border: '1px solid #333', margin: '0 auto' }}></div>
                   </Td>
                 </tr>
               ))}
 
               {/* Contactos de Emergencia */}
-              <Hdr cols={6}>EN CASO DE EMERGENCIA PERSONA DE CONTACTO</Hdr>
+              <Hdr cols={8}>EN CASO DE EMERGENCIA PERSONA DE CONTACTO</Hdr>
               <tr>
                 <Th style={{ width: '4%' }}></Th>
-                <Th colSpan={2}>APELLIDOS Y NOMBRES</Th>
-                <Th>PARENTESCO</Th>
+                <Th colSpan={3}>APELLIDOS Y NOMBRES</Th>
+                <Th colSpan={2}>PARENTESCO</Th>
                 <Th>TELÉFONO</Th>
                 <Th>OTRO</Th>
               </tr>
               {ctcRows.map((c, i) => (
                 <tr key={i}>
                   <Td style={{ color: '#555', fontSize: '7.5pt' }}>{i + 1}.-</Td>
-                  <Td colSpan={2}><span style={val}>{c?.apellidos_nombres}</span></Td>
-                  <Td><span style={val}>{c?.parentesco}</span></Td>
+                  <Td colSpan={3}><span style={val}>{c?.apellidos_nombres}</span></Td>
+                  <Td colSpan={2}><span style={val}>{c?.parentesco}</span></Td>
                   <Td><span style={val}>{c?.telefono}</span></Td>
                   <Td></Td>
                 </tr>
@@ -505,7 +496,7 @@ export default function WorkerPrint() {
 
               {/* Texto consentimiento */}
               <tr>
-                <Td colSpan={6} style={{ fontSize: '6.5pt', lineHeight: '1.6', padding: '6px 5px' }}>
+                <Td colSpan={8} style={{ fontSize: '6.5pt', lineHeight: '1.6', padding: '6px 5px' }}>
                   EL TRABAJADOR brinda su consentimiento para que LA EMPRESA permita el acceso a su información a empresas a las cuales sub contrata a efectos de cumplir con sus obligaciones laborales
                   así como también comparta su información personal con empresas relacionadas del sistema financiero y que estas lo contacten para ofrecerle productos que puedan ser de su interés.
                   Esta información recogida a través del presente formulario o cualquier otro documento a través del cual EL TRABAJADOR brinda información personal será almacenada en una base de datos
@@ -515,14 +506,14 @@ export default function WorkerPrint() {
                 </Td>
               </tr>
               <tr>
-                <Td colSpan={6} style={{ fontSize: '7.5pt', fontWeight: 'bold', padding: '6px 5px' }}>
+                <Td colSpan={8} style={{ fontSize: '7.5pt', fontWeight: 'bold', padding: '6px 5px' }}>
                   DEJO CONSTANCIA QUE LOS DATOS CONSIGNADOS EN LA PRESENTE FICHA SON VERACES, ASUMIENDO LA RESPONSABILIDAD EN CASO SER FALSOS.
                 </Td>
               </tr>
 
               {/* Firmas */}
               <tr>
-                <td colSpan={4} style={{ ...td, height: '90px', verticalAlign: 'bottom', padding: '4px 6px' }}>
+                <td colSpan={5} style={{ ...td, height: '90px', verticalAlign: 'bottom', padding: '4px 6px' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px' }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ borderTop: '1px solid #333', paddingTop: '3px', textAlign: 'center' }}>
@@ -540,7 +531,7 @@ export default function WorkerPrint() {
                     </div>
                   </div>
                 </td>
-                <td colSpan={2} style={{ ...td, height: '90px', verticalAlign: 'bottom', padding: '4px 6px' }}>
+                <td colSpan={3} style={{ ...td, height: '90px', verticalAlign: 'bottom', padding: '4px 6px' }}>
                   <div style={{ borderTop: '1px solid #333', paddingTop: '3px', textAlign: 'center', marginTop: '60px' }}>
                     <div style={{ fontSize: '7pt' }}>FIRMA DEL JEFE DE PERSONAL Y/O</div>
                     <div style={{ fontSize: '7pt' }}>ADMINISTRADOR DE OBRA</div>
@@ -548,9 +539,8 @@ export default function WorkerPrint() {
                 </td>
               </tr>
 
-            </tbody>
-          </table>
-        </div>
+          </tbody>
+        </table>
       </div>
     </>
   )
