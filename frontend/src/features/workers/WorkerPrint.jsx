@@ -179,10 +179,10 @@ export default function WorkerPrint() {
             <tr>
               {/* Logo */}
               <td style={{
-                border: '2px solid #333', padding: '6px 10px',
-                width: '90px', verticalAlign: 'middle', textAlign: 'center',
+                border: '2px solid #333', padding: '6px 12px',
+                width: '110px', verticalAlign: 'middle', textAlign: 'center',
               }}>
-                <LogoCumbres height={52} />
+                <LogoCumbres height={70} />
               </td>
               {/* Título */}
               <td style={{
