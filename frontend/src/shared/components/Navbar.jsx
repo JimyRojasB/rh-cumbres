@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LogOut, Users, Plus, Building2, LayoutDashboard } from 'lucide-react'
+import { LogOut, Users, Plus, LayoutDashboard } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function Navbar() {
@@ -18,20 +18,6 @@ export default function Navbar() {
 
   return (
     <nav className="bg-navy-700 shadow-lg">
-      {/* Top strip — branding */}
-      <div className="bg-navy-900 px-6 py-1.5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="bg-white rounded px-1.5 py-0.5">
-            <img src="/logo-cumbres.png" alt="Cumbres" className="h-7 w-auto" />
-          </div>
-          <span className="text-amber-400 text-xs font-light italic hidden sm:block">Cumplimos contigo</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-navy-300">
-          <Building2 size={12} />
-          <span>Constructora Cumbres Monumental S.A.C.</span>
-        </div>
-      </div>
-
       {/* Main nav */}
       <div className="px-6 py-0 flex items-center justify-between">
         <div className="flex items-center">
