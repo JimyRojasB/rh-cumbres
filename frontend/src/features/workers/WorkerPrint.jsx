@@ -154,6 +154,11 @@ export default function WorkerPrint() {
           body { margin: 0; background: white; }
           .ficha-wrap { padding: 5mm 7mm; max-width: 100% !important; box-shadow: none !important; }
           @page { margin: 8mm; size: A4; }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
         }
         .ficha-wrap { font-family: Arial, Helvetica, sans-serif; font-size: 8pt; }
       `}</style>
