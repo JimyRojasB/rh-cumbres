@@ -21,26 +21,10 @@ export default function Navbar() {
       {/* Top strip — branding */}
       <div className="bg-navy-900 px-6 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {/* Logo Cumbres — edificios SVG */}
-          <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
-            <rect x="4"  y="18" width="8"  height="18" rx="1" fill="#f59e0b"/>
-            <rect x="14" y="10" width="10" height="26" rx="1" fill="#fbbf24"/>
-            <rect x="26" y="14" width="10" height="22" rx="1" fill="#f59e0b"/>
-            <rect x="6"  y="22" width="2" height="3" rx="0.5" fill="#1e3a5c"/>
-            <rect x="9"  y="22" width="2" height="3" rx="0.5" fill="#1e3a5c"/>
-            <rect x="16" y="14" width="2" height="3" rx="0.5" fill="#1e3a5c"/>
-            <rect x="20" y="14" width="2" height="3" rx="0.5" fill="#1e3a5c"/>
-            <rect x="16" y="20" width="2" height="3" rx="0.5" fill="#1e3a5c"/>
-            <rect x="20" y="20" width="2" height="3" rx="0.5" fill="#1e3a5c"/>
-            <rect x="28" y="18" width="2" height="3" rx="0.5" fill="#1e3a5c"/>
-            <rect x="32" y="18" width="2" height="3" rx="0.5" fill="#1e3a5c"/>
-          </svg>
-          <div>
-            <span className="text-white font-bold text-sm tracking-widest uppercase">Cumbres</span>
-            <span className="text-amber-400 text-xs block leading-none font-light italic">
-              Cumplimos contigo
-            </span>
+          <div className="bg-white rounded px-1.5 py-0.5">
+            <img src="/logo-cumbres.png" alt="Cumbres" className="h-7 w-auto" />
           </div>
+          <span className="text-amber-400 text-xs font-light italic hidden sm:block">Cumplimos contigo</span>
         </div>
         <div className="flex items-center gap-2 text-xs text-navy-300">
           <Building2 size={12} />

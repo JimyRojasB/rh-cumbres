@@ -4,45 +4,14 @@ import { workerService } from './workerService'
 import toast from 'react-hot-toast'
 import { Printer, ArrowLeft } from 'lucide-react'
 
-/* ── SVG del logo CUMBRES (pirámide escalonada) ─────────────────── */
-function LogoCumbres({ size = 52 }) {
+/* ── Logo real de la empresa ────────────────────────────────────── */
+function LogoCumbres({ height = 56 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-      {/* Pirámide escalonada - 5 niveles */}
-      <rect x="26" y="4"  width="8"  height="8"  fill="#1a3a5c"/>
-      <rect x="20" y="14" width="20" height="8"  fill="#1a3a5c"/>
-      <rect x="14" y="24" width="32" height="8"  fill="#1a3a5c"/>
-      <rect x="8"  y="34" width="44" height="8"  fill="#1a3a5c"/>
-      <rect x="2"  y="44" width="56" height="8"  fill="#1a3a5c"/>
-      {/* Ventanas blancas en nivel 2 */}
-      <rect x="22" y="16" width="3" height="4" fill="white"/>
-      <rect x="28" y="16" width="3" height="4" fill="white"/>
-      <rect x="34" y="16" width="3" height="4" fill="white"/>
-      {/* Ventanas blancas en nivel 3 */}
-      <rect x="16" y="26" width="3" height="4" fill="white"/>
-      <rect x="22" y="26" width="3" height="4" fill="white"/>
-      <rect x="28" y="26" width="3" height="4" fill="white"/>
-      <rect x="34" y="26" width="3" height="4" fill="white"/>
-      <rect x="40" y="26" width="3" height="4" fill="white"/>
-      {/* Ventanas blancas en nivel 4 */}
-      <rect x="10" y="36" width="3" height="4" fill="white"/>
-      <rect x="16" y="36" width="3" height="4" fill="white"/>
-      <rect x="22" y="36" width="3" height="4" fill="white"/>
-      <rect x="28" y="36" width="3" height="4" fill="white"/>
-      <rect x="34" y="36" width="3" height="4" fill="white"/>
-      <rect x="40" y="36" width="3" height="4" fill="white"/>
-      <rect x="46" y="36" width="3" height="4" fill="white"/>
-      {/* Ventanas blancas en nivel 5 */}
-      <rect x="4"  y="46" width="3" height="4" fill="white"/>
-      <rect x="10" y="46" width="3" height="4" fill="white"/>
-      <rect x="16" y="46" width="3" height="4" fill="white"/>
-      <rect x="22" y="46" width="3" height="4" fill="white"/>
-      <rect x="28" y="46" width="3" height="4" fill="white"/>
-      <rect x="34" y="46" width="3" height="4" fill="white"/>
-      <rect x="40" y="46" width="3" height="4" fill="white"/>
-      <rect x="46" y="46" width="3" height="4" fill="white"/>
-      <rect x="52" y="46" width="3" height="4" fill="white"/>
-    </svg>
+    <img
+      src="/logo-cumbres.png"
+      alt="Cumbres"
+      style={{ height: `${height}px`, width: 'auto', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+    />
   )
 }
 
@@ -212,12 +181,9 @@ export default function WorkerPrint() {
               {/* Logo */}
               <td style={{
                 border: '2px solid #333', padding: '6px 10px',
-                width: '80px', verticalAlign: 'middle', textAlign: 'center',
+                width: '90px', verticalAlign: 'middle', textAlign: 'center',
               }}>
-                <LogoCumbres size={50} />
-                <div style={{ fontSize: '6pt', fontWeight: 'bold', color: '#1a3a5c', marginTop: '2px', letterSpacing: '1px' }}>
-                  CUMBRES
-                </div>
+                <LogoCumbres height={52} />
               </td>
               {/* Título */}
               <td style={{
