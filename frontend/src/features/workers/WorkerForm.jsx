@@ -3,17 +3,27 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { workerService } from './workerService'
 import toast from 'react-hot-toast'
-import { Save, ArrowLeft, Plus, Trash2, User, Briefcase, GraduationCap, Heart, Users, Phone, CreditCard } from 'lucide-react'
+import { Save, ArrowLeft, Plus, Trash2, User, Briefcase, GraduationCap, Heart, Users, Phone, CreditCard, ChevronDown, ChevronUp } from 'lucide-react'
 
 const CATEGORIAS = ['Oficial', 'Operario', 'Peón', 'Capataz', 'Maestro de Obra', 'Técnico', 'Ingeniero']
 const BANCOS = ['BCP', 'Interbank', 'BBVA', 'Scotiabank', 'BanBif', 'Pichincha', 'Otro']
 const AFPS = ['Habitat', 'Integra', 'Prima', 'Profuturo']
 
-function SectionHeader({ icon: Icon, title, color = 'bg-navy-700' }) {
+function AccordionSection({ icon: Icon, title, color = 'bg-navy-700', open, onToggle, children }) {
   return (
-    <div className={`${color} text-white px-4 py-2.5 flex items-center gap-2 rounded-t-lg`}>
-      <Icon size={16} />
-      <span className="text-sm font-semibold uppercase tracking-wide">{title}</span>
+    <div className="form-section">
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`${color} text-white px-4 py-2.5 flex items-center justify-between w-full rounded-t-lg ${!open ? 'rounded-b-lg' : ''}`}
+      >
+        <div className="flex items-center gap-2">
+          <Icon size={16} />
+          <span className="text-sm font-semibold uppercase tracking-wide">{title}</span>
+        </div>
+        {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      </button>
+      {open && children}
     </div>
   )
 }
@@ -34,6 +44,8 @@ export default function WorkerForm() {
   const isEdit = !!id
   const [loading, setLoading] = useState(isEdit)
   const [submitting, setSubmitting] = useState(false)
+  const [openSections, setOpenSections] = useState({ obrero: true, personal: false, financiero: false, instruccion: false, conyugue: false, hijos: false, padres: false, afp: false, contactos: false })
+  const toggleSection = (key) => setOpenSections(prev => ({ ...prev, [key]: !prev[key] }))
 
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
     defaultValues: {
@@ -132,8 +144,7 @@ export default function WorkerForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-0">
 
         {/* ── DATOS DEL EMPLEADOR / PERSONAL OBRERO ─────────────── */}
-        <div className="form-section">
-          <SectionHeader icon={Briefcase} title="Personal Obrero" color="bg-navy-700" />
+        <AccordionSection icon={Briefcase} title="Personal Obrero" color="bg-navy-700" open={openSections.obrero} onToggle={() => toggleSection('obrero')}>
           <div className="form-section-body grid-cols-1 md:grid-cols-3">
             <Field label="Código *" error={errors.codigo}>
               <input {...register('codigo', { required: 'Requerido' })} placeholder="OB-001" className="field-input" />
@@ -165,11 +176,10 @@ export default function WorkerForm() {
               </Field>
             </div>
           </div>
-        </div>
+        </AccordionSection>
 
         {/* ── DATOS PERSONALES ──────────────────────────────────── */}
-        <div className="form-section">
-          <SectionHeader icon={User} title="Datos Personales" color="bg-navy-600" />
+        <AccordionSection icon={User} title="Datos Personales" color="bg-navy-600" open={openSections.personal} onToggle={() => toggleSection('personal')}>
           <div className="form-section-body grid-cols-1 md:grid-cols-3">
             <Field label="Apellido Paterno *" error={errors.apellido_paterno}>
               <input {...register('apellido_paterno', { required: 'Requerido' })} placeholder="GARCIA" className="field-input uppercase" />
@@ -207,11 +217,10 @@ export default function WorkerForm() {
               <input type="email" {...register('correo_electronico')} placeholder="juan@email.com" className="field-input" />
             </Field>
           </div>
-        </div>
+        </AccordionSection>
 
         {/* ── DATOS FINANCIEROS ─────────────────────────────────── */}
-        <div className="form-section">
-          <SectionHeader icon={CreditCard} title="Datos Financieros" color="bg-navy-500" />
+        <AccordionSection icon={CreditCard} title="Datos Financieros" color="bg-navy-500" open={openSections.financiero} onToggle={() => toggleSection('financiero')}>
           <div className="form-section-body grid-cols-1 md:grid-cols-3">
             <Field label="Nombre del Banco">
               <select {...register('nombre_banco')} className="field-input">
@@ -229,11 +238,10 @@ export default function WorkerForm() {
               </select>
             </Field>
           </div>
-        </div>
+        </AccordionSection>
 
         {/* ── GRADO DE INSTRUCCIÓN ──────────────────────────────── */}
-        <div className="form-section">
-          <SectionHeader icon={GraduationCap} title="Grado de Instrucción" color="bg-amber-600" />
+        <AccordionSection icon={GraduationCap} title="Grado de Instrucción" color="bg-amber-600" open={openSections.instruccion} onToggle={() => toggleSection('instruccion')}>
           <div className="bg-white p-4 space-y-4">
             {[
               { index: 0, label: 'Primaria' },
@@ -260,11 +268,10 @@ export default function WorkerForm() {
               </div>
             ))}
           </div>
-        </div>
+        </AccordionSection>
 
         {/* ── DATOS DEL CÓNYUGE ─────────────────────────────────── */}
-        <div className="form-section">
-          <SectionHeader icon={Heart} title="Datos del Cónyuge" color="bg-navy-700" />
+        <AccordionSection icon={Heart} title="Datos del Cónyuge" color="bg-navy-700" open={openSections.conyugue} onToggle={() => toggleSection('conyugue')}>
           <div className="form-section-body grid-cols-1 md:grid-cols-3">
             <div className="md:col-span-2">
               <Field label="Apellidos y Nombres">
@@ -295,11 +302,10 @@ export default function WorkerForm() {
               <input {...register('conyugue.dni')} className="field-input" />
             </Field>
           </div>
-        </div>
+        </AccordionSection>
 
         {/* ── HIJOS ─────────────────────────────────────────────── */}
-        <div className="form-section">
-          <SectionHeader icon={Users} title="Hijos (Menores de 18 años)" color="bg-navy-600" />
+        <AccordionSection icon={Users} title="Hijos (Menores de 18 años)" color="bg-navy-600" open={openSections.hijos} onToggle={() => toggleSection('hijos')}>
           <div className="bg-white p-4 space-y-3">
             {hijosFields.map((field, index) => (
               <div key={field.id} className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end bg-gray-50 rounded-lg p-3">
@@ -334,11 +340,10 @@ export default function WorkerForm() {
               </button>
             )}
           </div>
-        </div>
+        </AccordionSection>
 
         {/* ── PADRES ────────────────────────────────────────────── */}
-        <div className="form-section">
-          <SectionHeader icon={Users} title="Padres del Colaborador" color="bg-navy-500" />
+        <AccordionSection icon={Users} title="Padres del Colaborador" color="bg-navy-500" open={openSections.padres} onToggle={() => toggleSection('padres')}>
           <div className="bg-white p-4 space-y-3">
             {[0, 1].map(i => (
               <div key={i} className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-gray-50 rounded-lg p-3">
@@ -360,11 +365,10 @@ export default function WorkerForm() {
               </div>
             ))}
           </div>
-        </div>
+        </AccordionSection>
 
         {/* ── AFP / PENSIÓN ─────────────────────────────────────── */}
-        <div className="form-section">
-          <SectionHeader icon={CreditCard} title="AFP / Sistema de Pensiones" color="bg-amber-600" />
+        <AccordionSection icon={CreditCard} title="AFP / Sistema de Pensiones" color="bg-amber-600" open={openSections.afp} onToggle={() => toggleSection('afp')}>
           <div className="form-section-body grid-cols-1 md:grid-cols-2">
             <Field label="Tipo de Afiliación">
               <select {...register('afp_pension.tipo')} className="field-input">
@@ -382,11 +386,10 @@ export default function WorkerForm() {
               <input {...register('afp_pension.afp_actual')} placeholder="AFP Habitat, Integra..." className="field-input" />
             </Field>
           </div>
-        </div>
+        </AccordionSection>
 
         {/* ── CONTACTOS DE EMERGENCIA ───────────────────────────── */}
-        <div className="form-section">
-          <SectionHeader icon={Phone} title="Contactos de Emergencia" color="bg-navy-700" />
+        <AccordionSection icon={Phone} title="Contactos de Emergencia" color="bg-navy-700" open={openSections.contactos} onToggle={() => toggleSection('contactos')}>
           <div className="bg-white p-4 space-y-3">
             {contactosFields.map((field, index) => (
               <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end bg-gray-50 rounded-lg p-3">
@@ -417,7 +420,7 @@ export default function WorkerForm() {
               </button>
             )}
           </div>
-        </div>
+        </AccordionSection>
 
         {/* ── ACCIONES ──────────────────────────────────────────── */}
         <div className="flex justify-end gap-3 pt-4 pb-8">

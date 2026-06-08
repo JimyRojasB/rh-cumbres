@@ -7,7 +7,7 @@ import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
 import {
   ArrowLeft, Pencil, User, Briefcase, GraduationCap,
-  Heart, Users, Phone, CreditCard, FileText, Building2
+  Heart, Users, Phone, CreditCard, FileText, Building2, Printer
 } from 'lucide-react'
 
 function InfoRow({ label, value }) {
@@ -87,11 +87,16 @@ export default function WorkerDetail() {
             </div>
           </div>
         </div>
-        {(user?.rol === 'admin' || user?.rol === 'rh') && (
-          <button onClick={() => navigate(`/trabajadores/${id}/editar`)} className="btn-amber">
-            <Pencil size={15} /> Editar Ficha
+        <div className="flex gap-2">
+          <button onClick={() => navigate(`/trabajadores/${id}/imprimir`)} className="btn-secondary py-2">
+            <Printer size={15} /> Imprimir
           </button>
-        )}
+          {(user?.rol === 'admin' || user?.rol === 'rh') && (
+            <button onClick={() => navigate(`/trabajadores/${id}/editar`)} className="btn-amber">
+              <Pencil size={15} /> Editar Ficha
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

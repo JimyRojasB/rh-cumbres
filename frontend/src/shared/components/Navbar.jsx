@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LogOut, Users, Plus, Building2 } from 'lucide-react'
+import { LogOut, Users, Plus, Building2, LayoutDashboard } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function Navbar() {
@@ -54,7 +54,18 @@ export default function Navbar() {
           <Link
             to="/"
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-              isActive('/') || location.pathname.startsWith('/trabajadores')
+              isActive('/')
+                ? 'border-amber-400 text-amber-400'
+                : 'border-transparent text-navy-200 hover:text-white hover:border-navy-400'
+            }`}
+          >
+            <LayoutDashboard size={16} />
+            Dashboard
+          </Link>
+          <Link
+            to="/trabajadores"
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              location.pathname.startsWith('/trabajadores')
                 ? 'border-amber-400 text-amber-400'
                 : 'border-transparent text-navy-200 hover:text-white hover:border-navy-400'
             }`}

@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
 import {
   Search, Plus, Eye, Pencil, Trash2, Users,
-  Filter, X, ChevronDown, Building2, HardHat
+  Filter, X, ChevronDown, Building2, HardHat, Printer
 } from 'lucide-react'
 
 const CATEGORIAS = ['Oficial', 'Operario', 'Peón', 'Capataz', 'Maestro de Obra', 'Técnico', 'Ingeniero']
@@ -242,6 +242,13 @@ export default function WorkerList() {
                           title="Ver ficha"
                         >
                           <Eye size={15} />
+                        </button>
+                        <button
+                          onClick={() => navigate(`/trabajadores/${w.id}/imprimir`)}
+                          className="p-1.5 text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                          title="Imprimir ficha"
+                        >
+                          <Printer size={15} />
                         </button>
                         {(user?.rol === 'admin' || user?.rol === 'rh') && (
                           <button
