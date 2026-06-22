@@ -6,6 +6,37 @@ import {
   Users, HardHat, Plus, TrendingUp, Building2,
   Eye, Printer, Calendar, AlertCircle
 } from 'lucide-react'
+import {
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  AreaChart, Area
+} from 'recharts'
+
+const CATEGORY_COLORS = {
+  'Oficial': '#f59e0b',
+  'Operario': '#1a3a5c',
+  'Peón': '#6b7280',
+  'Capataz': '#16a34a',
+  'Técnico': '#7c3aed',
+  'Maestro de Obra': '#0d6e6e',
+  'Ingeniero': '#dc2626',
+}
+
+const FRENTE_COLORS = ['#0f2744', '#1a3a5c', '#f59e0b', '#16a34a', '#7c3aed', '#0d6e6e']
+
+const BADGE_PALETTES = {
+  amber:  'bg-amber-100 text-amber-700',
+  navy:   'bg-navy-100 text-navy-700',
+  green:  'bg-green-100 text-green-700',
+  red:    'bg-red-100 text-red-700',
+  purple: 'bg-purple-100 text-purple-700',
+  gray:   'bg-gray-100 text-gray-600',
+}
+
+const CATEGORY_BADGE = {
+  'Oficial': 'amber', 'Operario': 'navy', 'Peón': 'gray',
+  'Capataz': 'green', 'Maestro de Obra': 'purple', 'Técnico': 'red',
+}
 
 function StatCard({ icon: Icon, label, value, color = 'text-navy-700', bg = 'bg-navy-50', border = 'border-navy-100' }) {
   return (
@@ -21,26 +52,34 @@ function StatCard({ icon: Icon, label, value, color = 'text-navy-700', bg = 'bg-
   )
 }
 
-function Badge({ text, color }) {
-  const palettes = {
-    amber:  'bg-amber-100 text-amber-700',
-    navy:   'bg-navy-100 text-navy-700',
-    green:  'bg-green-100 text-green-700',
-    red:    'bg-red-100 text-red-700',
-    purple: 'bg-purple-100 text-purple-700',
-    gray:   'bg-gray-100 text-gray-600',
-  }
+const CustomPieTooltip = ({ active, payload }) => {
+  if (!active || !payload?.length) return null
   return (
-    <span className={`text-xs font-semibold px-2 py-0.5 rounded ${palettes[color] || palettes.gray}`}>
-      {text}
-    </span>
+    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-lg text-xs">
+      <p className="font-semibold text-navy-700">{payload[0].name}</p>
+      <p className="text-gray-500">{payload[0].value} trabajadores</p>
+    </div>
   )
 }
 
-const CATEGORY_COLORS = {
-  'Oficial': 'amber', 'Operario': 'navy', 'Peón': 'gray',
-  'Capataz': 'green', 'Maestro de Obra': 'purple',
-  'Técnico': 'red', 'Ingeniero': 'navy',
+const CustomBarTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-lg text-xs">
+      <p className="font-semibold text-navy-700">{label}</p>
+      <p className="text-gray-500">{payload[0].value} trabajadores</p>
+    </div>
+  )
+}
+
+const CustomAreaTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-lg text-xs">
+      <p className="font-semibold text-navy-700">{label}</p>
+      <p className="text-amber-600">{payload[0].value} ingresaron</p>
+    </div>
+  )
 }
 
 export default function Dashboard() {
@@ -56,11 +95,10 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  /* ── Stats derivadas ── */
   const total = workers.length
 
   const porCategoria = workers.reduce((acc, w) => {
-    acc[w.categoria] = (acc[w.categoria] || 0) + 1
+    if (w.categoria) acc[w.categoria] = (acc[w.categoria] || 0) + 1
     return acc
   }, {})
 
@@ -70,10 +108,6 @@ export default function Dashboard() {
     return acc
   }, {})
 
-  const recientes = [...workers]
-    .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
-    .slice(0, 5)
-
   const ingresadosEsteMes = workers.filter(w => {
     if (!w.fecha_ingreso) return false
     const ing = new Date(w.fecha_ingreso + 'T00:00:00')
@@ -81,12 +115,41 @@ export default function Dashboard() {
     return ing.getMonth() === hoy.getMonth() && ing.getFullYear() === hoy.getFullYear()
   }).length
 
+  // Últimos 6 meses de ingresos
+  const ingresosPorMes = (() => {
+    const meses = []
+    const hoy = new Date()
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1)
+      const mes = d.toLocaleDateString('es-PE', { month: 'short', year: '2-digit' })
+      const count = workers.filter(w => {
+        if (!w.fecha_ingreso) return false
+        const ing = new Date(w.fecha_ingreso + 'T00:00:00')
+        return ing.getMonth() === d.getMonth() && ing.getFullYear() === d.getFullYear()
+      }).length
+      meses.push({ mes, count })
+    }
+    return meses
+  })()
+
+  const pieData = Object.entries(porCategoria)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, value]) => ({ name, value }))
+
+  const barData = Object.entries(porFrente)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, value]) => ({ name, value }))
+
+  const recientes = [...workers]
+    .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+    .slice(0, 5)
+
   const fmt = (d) => d ? new Date(d + (d.includes('T') ? '' : 'T00:00:00')).toLocaleDateString('es-PE') : '—'
 
   return (
     <div className="space-y-6">
 
-      {/* ── Bienvenida ── */}
+      {/* Bienvenida */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-navy-700 flex items-center gap-2">
@@ -113,109 +176,120 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
-          {/* ── Tarjetas de estadísticas ── */}
+          {/* Tarjetas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard icon={Users}      label="Total Trabajadores"    value={total}             color="text-navy-700"  bg="bg-navy-50"   border="border-navy-100" />
-            <StatCard icon={HardHat}    label="Categorías"            value={Object.keys(porCategoria).length} color="text-amber-600" bg="bg-amber-50" border="border-amber-100" />
-            <StatCard icon={Building2}  label="Frentes de Trabajo"    value={Object.keys(porFrente).filter(k => k !== 'Sin asignar').length} color="text-green-600" bg="bg-green-50" border="border-green-100" />
-            <StatCard icon={Calendar}   label="Ingresos este mes"     value={ingresadosEsteMes} color="text-purple-600" bg="bg-purple-50" border="border-purple-100" />
+            <StatCard icon={Users}     label="Total Trabajadores"  value={total}             color="text-navy-700"   bg="bg-navy-50"   border="border-navy-100" />
+            <StatCard icon={HardHat}   label="Categorías"          value={Object.keys(porCategoria).length} color="text-amber-600" bg="bg-amber-50" border="border-amber-100" />
+            <StatCard icon={Building2} label="Frentes de Trabajo"  value={Object.keys(porFrente).filter(k => k !== 'Sin asignar').length} color="text-green-600" bg="bg-green-50" border="border-green-100" />
+            <StatCard icon={Calendar}  label="Ingresos este mes"   value={ingresadosEsteMes} color="text-purple-600" bg="bg-purple-50" border="border-purple-100" />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Gráficas fila 1 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            {/* ── Distribución por categoría ── */}
+            {/* Donut — Por Categoría */}
             <div className="bg-white rounded-xl border border-navy-100 shadow-card overflow-hidden">
               <div className="bg-navy-700 text-white px-4 py-2.5 flex items-center gap-2">
                 <TrendingUp size={15} />
-                <span className="text-xs font-semibold uppercase tracking-wide">Por Categoría</span>
+                <span className="text-xs font-semibold uppercase tracking-wide">Distribución por Categoría</span>
               </div>
-              <div className="p-4 space-y-2">
-                {total === 0 ? (
-                  <p className="text-gray-400 text-sm text-center py-4">Sin datos</p>
+              <div className="p-4" style={{ height: 260 }}>
+                {pieData.length === 0 ? (
+                  <p className="text-gray-400 text-sm text-center pt-10">Sin datos</p>
                 ) : (
-                  Object.entries(porCategoria)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([cat, count]) => (
-                      <div key={cat} className="flex items-center gap-3">
-                        <span className="text-sm text-gray-700 w-36 truncate">{cat}</span>
-                        <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-amber-400 h-2 rounded-full transition-all"
-                            style={{ width: `${(count / total) * 100}%` }}
-                          />
-                        </div>
-                        <span className="text-xs font-bold text-navy-700 w-8 text-right">{count}</span>
-                      </div>
-                    ))
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="45%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={90}
+                        paddingAngle={3}
+                        dataKey="value"
+                        animationBegin={0}
+                        animationDuration={800}
+                      >
+                        {pieData.map((entry) => (
+                          <Cell key={entry.name} fill={CATEGORY_COLORS[entry.name] || '#94a3b8'} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomPieTooltip />} />
+                      <Legend
+                        layout="vertical"
+                        align="right"
+                        verticalAlign="middle"
+                        formatter={(value) => <span style={{ fontSize: '11px', color: '#374151' }}>{value}</span>}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
                 )}
               </div>
             </div>
 
-            {/* ── Distribución por frente ── */}
+            {/* Bar — Por Frente */}
             <div className="bg-white rounded-xl border border-navy-100 shadow-card overflow-hidden">
               <div className="bg-navy-600 text-white px-4 py-2.5 flex items-center gap-2">
                 <Building2 size={15} />
-                <span className="text-xs font-semibold uppercase tracking-wide">Por Frente de Trabajo</span>
+                <span className="text-xs font-semibold uppercase tracking-wide">Personal por Frente de Trabajo</span>
               </div>
-              <div className="p-4 space-y-2">
-                {total === 0 ? (
-                  <p className="text-gray-400 text-sm text-center py-4">Sin datos</p>
+              <div className="p-4" style={{ height: 260 }}>
+                {barData.length === 0 ? (
+                  <p className="text-gray-400 text-sm text-center pt-10">Sin datos</p>
                 ) : (
-                  Object.entries(porFrente)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([frente, count]) => (
-                      <div key={frente} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
-                        <span className="text-sm text-gray-700">{frente}</span>
-                        <span className="text-xs font-bold bg-navy-100 text-navy-700 px-2 py-0.5 rounded">
-                          {count} {count === 1 ? 'trabajador' : 'trabajadores'}
-                        </span>
-                      </div>
-                    ))
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={barData} layout="vertical" margin={{ left: 8, right: 24, top: 4, bottom: 4 }}>
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                      <XAxis type="number" tick={{ fontSize: 11, fill: '#6b7280' }} allowDecimals={false} />
+                      <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#374151' }} width={72} />
+                      <Tooltip content={<CustomBarTooltip />} />
+                      <Bar dataKey="value" radius={[0, 6, 6, 0]} animationDuration={800}>
+                        {barData.map((_, i) => (
+                          <Cell key={i} fill={FRENTE_COLORS[i % FRENTE_COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
                 )}
-              </div>
-            </div>
-
-            {/* ── Accesos rápidos ── */}
-            <div className="bg-white rounded-xl border border-navy-100 shadow-card overflow-hidden">
-              <div className="bg-amber-500 text-white px-4 py-2.5 flex items-center gap-2">
-                <AlertCircle size={15} />
-                <span className="text-xs font-semibold uppercase tracking-wide">Accesos Rápidos</span>
-              </div>
-              <div className="p-4 space-y-2">
-                <Link to="/trabajadores" className="flex items-center gap-3 p-3 rounded-lg hover:bg-navy-50 transition-colors group">
-                  <div className="w-9 h-9 bg-navy-100 rounded-lg flex items-center justify-center group-hover:bg-navy-200 transition-colors">
-                    <Users size={16} className="text-navy-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-navy-700">Todos los Trabajadores</p>
-                    <p className="text-xs text-gray-400">Ver lista completa</p>
-                  </div>
-                </Link>
-                {(user?.rol === 'admin' || user?.rol === 'rh') && (
-                  <Link to="/trabajadores/nuevo" className="flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 transition-colors group">
-                    <div className="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center group-hover:bg-amber-200 transition-colors">
-                      <Plus size={16} className="text-amber-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-navy-700">Registrar Trabajador</p>
-                      <p className="text-xs text-gray-400">Agregar nuevo registro</p>
-                    </div>
-                  </Link>
-                )}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-                  <div className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Building2 size={16} className="text-gray-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Constructora Cumbres</p>
-                    <p className="text-xs text-gray-400">RUC: 20607279161</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* ── Trabajadores recientes ── */}
+          {/* Area — Ingresos por mes */}
+          <div className="bg-white rounded-xl border border-navy-100 shadow-card overflow-hidden">
+            <div className="bg-amber-500 text-white px-4 py-2.5 flex items-center gap-2">
+              <Calendar size={15} />
+              <span className="text-xs font-semibold uppercase tracking-wide">Ingresos de Personal — Últimos 6 Meses</span>
+            </div>
+            <div className="p-4" style={{ height: 220 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={ingresosPorMes} margin={{ left: 0, right: 16, top: 8, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#6b7280' }} />
+                  <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} allowDecimals={false} />
+                  <Tooltip content={<CustomAreaTooltip />} />
+                  <Area
+                    type="monotone"
+                    dataKey="count"
+                    stroke="#f59e0b"
+                    strokeWidth={2.5}
+                    fill="url(#areaGradient)"
+                    animationDuration={800}
+                    dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, fill: '#d97706' }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Tabla de recientes */}
           <div className="bg-white rounded-xl border border-navy-100 shadow-card overflow-hidden">
             <div className="bg-navy-700 text-white px-4 py-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -236,12 +310,9 @@ export default function Dashboard() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 bg-gray-50">
-                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Código</th>
-                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Trabajador</th>
-                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Categoría</th>
-                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Frente</th>
-                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Ingreso</th>
-                      <th className="text-center px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Acciones</th>
+                      {['Código', 'Trabajador', 'Categoría', 'Frente', 'Ingreso', 'Acciones'].map(h => (
+                        <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
@@ -255,24 +326,20 @@ export default function Dashboard() {
                           <p className="text-gray-400 text-xs">{w.nombres}</p>
                         </td>
                         <td className="px-4 py-3">
-                          <Badge text={w.categoria} color={CATEGORY_COLORS[w.categoria] || 'gray'} />
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded ${BADGE_PALETTES[CATEGORY_BADGE[w.categoria]] || BADGE_PALETTES.gray}`}>
+                            {w.categoria}
+                          </span>
                         </td>
                         <td className="px-4 py-3 text-gray-600 text-xs">{w.frente_trabajo || '—'}</td>
                         <td className="px-4 py-3 text-gray-600 text-xs">{fmt(w.fecha_ingreso)}</td>
                         <td className="px-4 py-3">
-                          <div className="flex items-center justify-center gap-1">
-                            <button
-                              onClick={() => navigate(`/trabajadores/${w.id}`)}
-                              className="p-1.5 text-navy-600 hover:bg-navy-100 rounded-md transition-colors"
-                              title="Ver ficha"
-                            >
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => navigate(`/trabajadores/${w.id}`)}
+                              className="p-1.5 text-navy-600 hover:bg-navy-100 rounded-md transition-colors" title="Ver ficha">
                               <Eye size={14} />
                             </button>
-                            <button
-                              onClick={() => navigate(`/trabajadores/${w.id}/imprimir`)}
-                              className="p-1.5 text-green-600 hover:bg-green-50 rounded-md transition-colors"
-                              title="Imprimir ficha"
-                            >
+                            <button onClick={() => navigate(`/trabajadores/${w.id}/imprimir`)}
+                              className="p-1.5 text-green-600 hover:bg-green-50 rounded-md transition-colors" title="Imprimir ficha">
                               <Printer size={14} />
                             </button>
                           </div>
