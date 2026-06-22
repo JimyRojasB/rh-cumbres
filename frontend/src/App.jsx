@@ -8,6 +8,7 @@ import WorkerDetail from './features/workers/WorkerDetail'
 import WorkerPrint from './features/workers/WorkerPrint'
 import WorkerFotocheck from './features/workers/WorkerFotocheck'
 import WorkerVerify from './features/workers/WorkerVerify'
+import Reports from './features/reports/Reports'
 import Navbar from './shared/components/Navbar'
 
 function ProtectedRoute({ children }) {
@@ -27,19 +28,22 @@ export default function App() {
         path="/*"
         element={
           <ProtectedRoute>
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 flex">
               <Navbar />
-              <main className="max-w-7xl mx-auto px-4 py-6">
-                <Routes>
-                  <Route path="/"                          element={<Dashboard />} />
-                  <Route path="/trabajadores"              element={<WorkerList />} />
-                  <Route path="/trabajadores/nuevo"        element={<WorkerForm />} />
-                  <Route path="/trabajadores/:id"          element={<WorkerDetail />} />
-                  <Route path="/trabajadores/:id/editar"   element={<WorkerForm />} />
-                  <Route path="/trabajadores/:id/imprimir"   element={<WorkerPrint />} />
-                  <Route path="/trabajadores/:id/fotocheck" element={<WorkerFotocheck />} />
-                  <Route path="*"                          element={<Navigate to="/" replace />} />
-                </Routes>
+              <main className="flex-1 ml-60 min-h-screen">
+                <div className="max-w-6xl mx-auto px-6 py-6">
+                  <Routes>
+                    <Route path="/"                          element={<Dashboard />} />
+                    <Route path="/trabajadores"              element={<WorkerList />} />
+                    <Route path="/trabajadores/nuevo"        element={<WorkerForm />} />
+                    <Route path="/trabajadores/:id"          element={<WorkerDetail />} />
+                    <Route path="/trabajadores/:id/editar"   element={<WorkerForm />} />
+                    <Route path="/trabajadores/:id/imprimir"   element={<WorkerPrint />} />
+                    <Route path="/trabajadores/:id/fotocheck" element={<WorkerFotocheck />} />
+                    <Route path="/reportes"                  element={<Reports />} />
+                    <Route path="*"                          element={<Navigate to="/" replace />} />
+                  </Routes>
+                </div>
               </main>
             </div>
           </ProtectedRoute>
