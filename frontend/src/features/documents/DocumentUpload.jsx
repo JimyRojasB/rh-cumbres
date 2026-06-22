@@ -3,7 +3,7 @@ import { documentService } from './documentService'
 import toast from 'react-hot-toast'
 import { Upload, FileUp } from 'lucide-react'
 
-const TIPOS = ['Contrato', 'DNI', 'Ficha personal', 'Certificado', 'Constancia', 'Otro']
+const TIPOS = ['Foto', 'Huella Digital', 'Contrato', 'DNI', 'Ficha personal', 'Certificado', 'Constancia', 'Otro']
 
 export default function DocumentUpload({ trabajadorId, onUploaded }) {
   const inputRef = useRef()
@@ -71,7 +71,7 @@ export default function DocumentUpload({ trabajadorId, onUploaded }) {
       <input
         ref={inputRef}
         type="file"
-        accept=".pdf,.jpg,.jpeg,.png"
+        accept={['Foto', 'Huella Digital'].includes(tipo) ? '.jpg,.jpeg,.png,.webp' : '.pdf,.jpg,.jpeg,.png'}
         className="hidden"
         onChange={e => handleFile(e.target.files[0])}
       />

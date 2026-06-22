@@ -6,6 +6,8 @@ import WorkerList from './features/workers/WorkerList'
 import WorkerForm from './features/workers/WorkerForm'
 import WorkerDetail from './features/workers/WorkerDetail'
 import WorkerPrint from './features/workers/WorkerPrint'
+import WorkerFotocheck from './features/workers/WorkerFotocheck'
+import WorkerVerify from './features/workers/WorkerVerify'
 import Navbar from './shared/components/Navbar'
 
 function ProtectedRoute({ children }) {
@@ -20,6 +22,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={isAuth ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/verificar/:id" element={<WorkerVerify />} />
       <Route
         path="/*"
         element={
@@ -33,7 +36,8 @@ export default function App() {
                   <Route path="/trabajadores/nuevo"        element={<WorkerForm />} />
                   <Route path="/trabajadores/:id"          element={<WorkerDetail />} />
                   <Route path="/trabajadores/:id/editar"   element={<WorkerForm />} />
-                  <Route path="/trabajadores/:id/imprimir" element={<WorkerPrint />} />
+                  <Route path="/trabajadores/:id/imprimir"   element={<WorkerPrint />} />
+                  <Route path="/trabajadores/:id/fotocheck" element={<WorkerFotocheck />} />
                   <Route path="*"                          element={<Navigate to="/" replace />} />
                 </Routes>
               </main>

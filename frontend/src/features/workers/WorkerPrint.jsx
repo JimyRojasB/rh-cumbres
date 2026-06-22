@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { workerService } from './workerService'
+import { documentService } from '../documents/documentService'
 import toast from 'react-hot-toast'
 import { Printer, ArrowLeft } from 'lucide-react'
 
@@ -72,12 +73,21 @@ export default function WorkerPrint() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [worker, setWorker] = useState(null)
+  const [fotoUrl, setFotoUrl] = useState(null)
+  const [huellaUrl, setHuellaUrl] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    workerService.get(id)
-      .then(setWorker)
-      .catch(() => toast.error('Trabajador no encontrado'))
+    Promise.all([
+      workerService.get(id),
+      documentService.list(id),
+    ]).then(([w, docs]) => {
+      setWorker(w)
+      const foto = docs.find(d => d.tipo_documento === 'Foto')
+      const huella = docs.find(d => d.tipo_documento === 'Huella Digital')
+      setFotoUrl(foto?.url_storage || null)
+      setHuellaUrl(huella?.url_storage || null)
+    }).catch(() => toast.error('Trabajador no encontrado'))
       .finally(() => setLoading(false))
   }, [id])
 
@@ -229,12 +239,15 @@ export default function WorkerPrint() {
               {/* Huella + Foto — rowSpan cubre toda la sección Personal Obrero */}
               <td colSpan={3} rowSpan={10} style={{ ...td, verticalAlign: 'top', padding: '4px' }}>
                 <div style={{ display: 'flex', gap: '6px', height: '100%', minHeight: '130px' }}>
-                  <div style={{ flex: 1, border: '1px solid #888', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: '4px' }}>
-                    <span style={{ fontSize: '6pt', color: '#666' }}>HUELLA DIGITAL</span>
+                  <div style={{ flex: 1, border: '1px solid #888', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', overflow: 'hidden' }}>
+                    {huellaUrl
+                      ? <img src={huellaUrl} alt="Huella" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <span style={{ fontSize: '6pt', color: '#666', marginTop: 'auto', marginBottom: '4px' }}>HUELLA DIGITAL</span>
+                    }
                   </div>
                   <div style={{ flex: 1, border: '1px solid #888', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', overflow: 'hidden' }}>
-                    {worker.foto_url
-                      ? <img src={worker.foto_url} alt="Foto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {fotoUrl
+                      ? <img src={fotoUrl} alt="Foto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       : <span style={{ fontSize: '6pt', color: '#666', marginTop: 'auto', marginBottom: '4px' }}>FOTO</span>
                     }
                   </div>

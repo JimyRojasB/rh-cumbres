@@ -41,6 +41,23 @@ def create_trabajador(
     return TrabajadorService(db).create(data)
 
 
+@router.get("/verificar/{id}")
+def verificar_trabajador(id: str, db=Depends(get_supabase)):
+    """Endpoint público — no requiere autenticación. Solo devuelve datos básicos."""
+    worker = TrabajadorService(db).get(id)
+    return {
+        "nombres": worker.get("nombres"),
+        "apellido_paterno": worker.get("apellido_paterno"),
+        "apellido_materno": worker.get("apellido_materno"),
+        "codigo": worker.get("codigo"),
+        "categoria": worker.get("categoria"),
+        "ocupacion": worker.get("ocupacion"),
+        "empresa": worker.get("empresa"),
+        "fecha_ingreso": worker.get("fecha_ingreso"),
+        "estado": "ACTIVO",
+    }
+
+
 @router.get("/{id}")
 def get_trabajador(
     id: str,

@@ -25,7 +25,7 @@ export default function DocumentList({ trabajadorId }) {
   useEffect(() => {
     documentService.list(trabajadorId)
       .then(setDocs)
-      .catch(() => toast.error('Error al cargar documentos'))
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [trabajadorId])
 

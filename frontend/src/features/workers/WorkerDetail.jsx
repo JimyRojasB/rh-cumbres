@@ -3,11 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { workerService } from './workerService'
 import DocumentUpload from '../documents/DocumentUpload'
 import DocumentList from '../documents/DocumentList'
+import { documentService } from '../documents/documentService'
 import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
 import {
   ArrowLeft, Pencil, User, Briefcase, GraduationCap,
-  Heart, Users, Phone, CreditCard, FileText, Building2, Printer
+  Heart, Users, Phone, CreditCard, FileText, Building2, Printer, BadgeCheck
 } from 'lucide-react'
 
 function InfoRow({ label, value }) {
@@ -38,13 +39,23 @@ export default function WorkerDetail() {
   const [worker, setWorker] = useState(null)
   const [loading, setLoading] = useState(true)
   const [docsKey, setDocsKey] = useState(0)
+  const [fotoUrl, setFotoUrl] = useState(null)
 
   useEffect(() => {
     workerService.get(id)
       .then(setWorker)
-      .catch(() => toast.error('Trabajador no encontrado'))
+      .catch((err) => {
+        if (err.response?.status === 404) toast.error('Trabajador no encontrado')
+      })
       .finally(() => setLoading(false))
   }, [id])
+
+  useEffect(() => {
+    documentService.list(id).then(docs => {
+      const foto = docs.find(d => d.tipo_documento === 'Foto')
+      setFotoUrl(foto?.url_storage || null)
+    }).catch(() => {})
+  }, [id, docsKey])
 
   if (loading) return (
     <div className="flex items-center justify-center py-20">
@@ -72,6 +83,13 @@ export default function WorkerDetail() {
           <button onClick={() => navigate(-1)} className="btn-secondary py-2 px-3">
             <ArrowLeft size={16} />
           </button>
+          {/* Foto del trabajador */}
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-navy-200 bg-navy-100 flex items-center justify-center shrink-0">
+            {fotoUrl
+              ? <img src={fotoUrl} alt="Foto" className="w-full h-full object-cover" />
+              : <User size={24} className="text-navy-400" />
+            }
+          </div>
           <div>
             <div className="flex items-center gap-2">
               <Building2 size={16} className="text-amber-500" />
@@ -88,6 +106,9 @@ export default function WorkerDetail() {
           </div>
         </div>
         <div className="flex gap-2">
+          <button onClick={() => navigate(`/trabajadores/${id}/fotocheck`)} className="btn-secondary py-2">
+            <BadgeCheck size={15} /> Fotocheck
+          </button>
           <button onClick={() => navigate(`/trabajadores/${id}/imprimir`)} className="btn-secondary py-2">
             <Printer size={15} /> Imprimir
           </button>
