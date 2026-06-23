@@ -35,6 +35,8 @@ export default function AiChat() {
       const detail = err?.response?.data?.detail || ''
       const msg = detail.includes('429') || detail.includes('RESOURCE_EXHAUSTED')
         ? 'Límite de consultas alcanzado. Espera 1 minuto e intenta de nuevo.'
+        : detail.includes('503') || detail.includes('UNAVAILABLE')
+        ? 'El servicio de IA tiene alta demanda ahora. Intenta en unos minutos.'
         : 'Error al consultar el asistente. Intenta de nuevo.'
       setMessages(m => [...m, { role: 'bot', text: msg }])
     } finally {
@@ -64,7 +66,7 @@ export default function AiChat() {
             </div>
             <div>
               <p className="text-white font-semibold text-sm">Asistente RRHH</p>
-              <p className="text-navy-300 text-xs">Impulsado por Gemini AI</p>
+              <p className="text-navy-300 text-xs">Impulsado por Groq AI</p>
             </div>
           </div>
 
