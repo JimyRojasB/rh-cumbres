@@ -10,6 +10,7 @@ import WorkerFotocheck from './features/workers/WorkerFotocheck'
 import WorkerVerify from './features/workers/WorkerVerify'
 import Reports from './features/reports/Reports'
 import Navbar from './shared/components/Navbar'
+import AiChat from './features/ai/AiChat'
 
 function ProtectedRoute({ children }) {
   const { isAuth, loading } = useAuth()
@@ -45,6 +46,7 @@ export default function App() {
                   </Routes>
                 </div>
               </main>
+              <AiChat />
             </div>
           </ProtectedRoute>
         }
