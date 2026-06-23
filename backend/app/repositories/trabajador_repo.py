@@ -29,6 +29,8 @@ class TrabajadorRepository:
             query = query.gte("fecha_ingreso", filters["fecha_ingreso_desde"])
         if filters.get("fecha_ingreso_hasta"):
             query = query.lte("fecha_ingreso", filters["fecha_ingreso_hasta"])
+        if filters.get("estado"):
+            query = query.eq("estado", filters["estado"])
 
         result = query.order("created_at", desc=True).execute()
         return result.data or []

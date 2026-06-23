@@ -87,6 +87,7 @@ class TrabajadorCreate(BaseModel):
 
 class TrabajadorUpdate(BaseModel):
     codigo: Optional[str] = None
+    estado: Optional[str] = None
     categoria: Optional[str] = None
     ocupacion: Optional[str] = None
     frente_trabajo: Optional[str] = None

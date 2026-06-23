@@ -17,6 +17,7 @@ def list_trabajadores(
     frente_trabajo: Optional[str] = Query(None),
     fecha_ingreso_desde: Optional[str] = Query(None),
     fecha_ingreso_hasta: Optional[str] = Query(None),
+    estado: Optional[str] = Query(None),
     db=Depends(get_supabase),
     current_user: dict = Depends(get_current_user),
 ):
@@ -28,6 +29,7 @@ def list_trabajadores(
         "frente_trabajo": frente_trabajo,
         "fecha_ingreso_desde": fecha_ingreso_desde,
         "fecha_ingreso_hasta": fecha_ingreso_hasta,
+        "estado": estado,
     }
     return TrabajadorService(db).list(filters)
 
@@ -39,6 +41,22 @@ def create_trabajador(
     current_user: dict = Depends(require_rh_or_admin),
 ):
     return TrabajadorService(db).create(data)
+
+
+@router.patch("/{id}/estado")
+def update_estado(
+    id: str,
+    body: dict,
+    db=Depends(get_supabase),
+    current_user: dict = Depends(require_rh_or_admin),
+):
+    from fastapi import HTTPException
+    ESTADOS = ["Activo", "Suspendido", "De Vacaciones", "Con Permiso", "Retirado"]
+    estado = body.get("estado")
+    if estado not in ESTADOS:
+        raise HTTPException(status_code=400, detail="Estado inválido")
+    db.table("trabajadores").update({"estado": estado}).eq("id", id).execute()
+    return TrabajadorService(db).get(id)
 
 
 @router.get("/verificar/{id}")
@@ -54,7 +72,7 @@ def verificar_trabajador(id: str, db=Depends(get_supabase)):
         "ocupacion": worker.get("ocupacion"),
         "empresa": worker.get("empresa"),
         "fecha_ingreso": worker.get("fecha_ingreso"),
-        "estado": "ACTIVO",
+        "estado": worker.get("estado", "Activo"),
     }
 
 

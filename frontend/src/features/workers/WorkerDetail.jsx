@@ -8,8 +8,17 @@ import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
 import {
   ArrowLeft, Pencil, User, Briefcase, GraduationCap,
-  Heart, Users, Phone, CreditCard, FileText, Building2, Printer, BadgeCheck
+  Heart, Users, Phone, CreditCard, FileText, Building2, Printer, BadgeCheck, ChevronDown
 } from 'lucide-react'
+
+const ESTADOS = ['Activo', 'Suspendido', 'De Vacaciones', 'Con Permiso', 'Retirado']
+const ESTADO_STYLES = {
+  'Activo':        'bg-green-100 text-green-700 border-green-200',
+  'Suspendido':    'bg-orange-100 text-orange-700 border-orange-200',
+  'De Vacaciones': 'bg-blue-100 text-blue-700 border-blue-200',
+  'Con Permiso':   'bg-yellow-100 text-yellow-700 border-yellow-200',
+  'Retirado':      'bg-red-100 text-red-700 border-red-200',
+}
 
 function InfoRow({ label, value }) {
   return (
@@ -40,6 +49,7 @@ export default function WorkerDetail() {
   const [loading, setLoading] = useState(true)
   const [docsKey, setDocsKey] = useState(0)
   const [fotoUrl, setFotoUrl] = useState(null)
+  const [estadoLoading, setEstadoLoading] = useState(false)
 
   useEffect(() => {
     workerService.get(id)
@@ -73,6 +83,20 @@ export default function WorkerDetail() {
     </div>
   )
 
+  const handleEstado = async (nuevoEstado) => {
+    if (nuevoEstado === worker.estado) return
+    setEstadoLoading(true)
+    try {
+      const updated = await workerService.updateEstado(id, nuevoEstado)
+      setWorker(updated)
+      toast.success(`Estado cambiado a ${nuevoEstado}`)
+    } catch {
+      toast.error('Error al cambiar estado')
+    } finally {
+      setEstadoLoading(false)
+    }
+  }
+
   const fmt = (date) => date ? new Date(date).toLocaleDateString('es-PE') : null
 
   return (
@@ -98,10 +122,28 @@ export default function WorkerDetail() {
             <h1 className="text-2xl font-bold text-navy-700">
               {worker.apellido_paterno} {worker.apellido_materno}, {worker.nombres}
             </h1>
-            <div className="flex items-center gap-3 mt-1">
+            <div className="flex items-center gap-3 mt-1 flex-wrap">
               <span className="font-mono text-xs bg-navy-100 text-navy-700 px-2 py-0.5 rounded">{worker.codigo}</span>
               <span className="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded">{worker.categoria}</span>
               <span className="text-xs text-gray-500">{worker.ocupacion}</span>
+              {/* Badge de estado con selector */}
+              {(user?.rol === 'admin' || user?.rol === 'rh') ? (
+                <div className="relative">
+                  <select
+                    value={worker.estado || 'Activo'}
+                    onChange={e => handleEstado(e.target.value)}
+                    disabled={estadoLoading}
+                    className={`text-xs font-semibold px-2 py-0.5 rounded border cursor-pointer appearance-none pr-5 ${ESTADO_STYLES[worker.estado] || ESTADO_STYLES['Activo']}`}
+                  >
+                    {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
+                  </select>
+                  <ChevronDown size={10} className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none opacity-60" />
+                </div>
+              ) : (
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${ESTADO_STYLES[worker.estado] || ESTADO_STYLES['Activo']}`}>
+                  {worker.estado || 'Activo'}
+                </span>
+              )}
             </div>
           </div>
         </div>

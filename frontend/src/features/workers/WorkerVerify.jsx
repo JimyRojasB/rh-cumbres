@@ -55,12 +55,24 @@ export default function WorkerVerify() {
           </div>
         </div>
 
-        {/* Badge ACTIVO */}
-        <div style={{ background: '#dcfce7', borderBottom: '3px solid #16a34a', padding: '16px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-          <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: '#16a34a', boxShadow: '0 0 0 3px rgba(22,163,74,0.3)' }} />
-          <span style={{ color: '#15803d', fontWeight: 'bold', fontSize: '16pt', letterSpacing: '2px' }}>ACTIVO</span>
-          <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: '#16a34a', boxShadow: '0 0 0 3px rgba(22,163,74,0.3)' }} />
-        </div>
+        {/* Badge de estado real */}
+        {(() => {
+          const estadoStyles = {
+            'Activo':        { bg: '#dcfce7', border: '#16a34a', color: '#15803d', dot: '#16a34a', shadow: 'rgba(22,163,74,0.3)' },
+            'Suspendido':    { bg: '#ffedd5', border: '#ea580c', color: '#c2410c', dot: '#ea580c', shadow: 'rgba(234,88,12,0.3)' },
+            'De Vacaciones': { bg: '#dbeafe', border: '#2563eb', color: '#1d4ed8', dot: '#2563eb', shadow: 'rgba(37,99,235,0.3)' },
+            'Con Permiso':   { bg: '#fef9c3', border: '#ca8a04', color: '#a16207', dot: '#ca8a04', shadow: 'rgba(202,138,4,0.3)' },
+            'Retirado':      { bg: '#fee2e2', border: '#dc2626', color: '#b91c1c', dot: '#dc2626', shadow: 'rgba(220,38,38,0.3)' },
+          }
+          const s = estadoStyles[worker.estado] || estadoStyles['Activo']
+          return (
+            <div style={{ background: s.bg, borderBottom: `3px solid ${s.border}`, padding: '16px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+              <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: s.dot, boxShadow: `0 0 0 3px ${s.shadow}` }} />
+              <span style={{ color: s.color, fontWeight: 'bold', fontSize: '16pt', letterSpacing: '2px' }}>{(worker.estado || 'ACTIVO').toUpperCase()}</span>
+              <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: s.dot, boxShadow: `0 0 0 3px ${s.shadow}` }} />
+            </div>
+          )
+        })()}
 
         {/* Datos del trabajador */}
         <div style={{ padding: '24px' }}>

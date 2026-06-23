@@ -9,6 +9,14 @@ import {
 } from 'lucide-react'
 
 const CATEGORIAS = ['Oficial', 'Operario', 'Peón', 'Capataz', 'Maestro de Obra', 'Técnico', 'Ingeniero']
+const ESTADOS = ['Activo', 'Suspendido', 'De Vacaciones', 'Con Permiso', 'Retirado']
+const ESTADO_STYLES = {
+  'Activo':        'bg-green-100 text-green-700',
+  'Suspendido':    'bg-orange-100 text-orange-700',
+  'De Vacaciones': 'bg-blue-100 text-blue-700',
+  'Con Permiso':   'bg-yellow-100 text-yellow-700',
+  'Retirado':      'bg-red-100 text-red-700',
+}
 
 export default function WorkerList() {
   const { user } = useAuth()
@@ -19,7 +27,7 @@ export default function WorkerList() {
   const [deleteId, setDeleteId] = useState(null)
   const [filters, setFilters] = useState({
     nombre: '', dni: '', categoria: '', ocupacion: '',
-    frente_trabajo: '', fecha_ingreso_desde: '', fecha_ingreso_hasta: ''
+    frente_trabajo: '', fecha_ingreso_desde: '', fecha_ingreso_hasta: '', estado: ''
   })
 
   const fetchWorkers = useCallback(async () => {
@@ -42,7 +50,7 @@ export default function WorkerList() {
   }
 
   const clearFilters = () => {
-    setFilters({ nombre: '', dni: '', categoria: '', ocupacion: '', frente_trabajo: '', fecha_ingreso_desde: '', fecha_ingreso_hasta: '' })
+    setFilters({ nombre: '', dni: '', categoria: '', ocupacion: '', frente_trabajo: '', fecha_ingreso_desde: '', fecha_ingreso_hasta: '', estado: '' })
   }
 
   const confirmDelete = async () => {
@@ -155,6 +163,17 @@ export default function WorkerList() {
                 />
               </div>
               <div>
+                <label className="field-label">Estado</label>
+                <select
+                  value={filters.estado}
+                  onChange={e => setFilters(f => ({ ...f, estado: e.target.value }))}
+                  className="field-input"
+                >
+                  <option value="">Todos</option>
+                  {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+              <div>
                 <label className="field-label">Ingreso Desde</label>
                 <input
                   type="date"
@@ -181,6 +200,7 @@ export default function WorkerList() {
                 <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wide">Ocupación</th>
                 <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wide">Frente</th>
                 <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wide">Ingreso</th>
+                <th className="text-left px-4 py-3 font-semibold text-xs uppercase tracking-wide">Estado</th>
                 <th className="text-center px-4 py-3 font-semibold text-xs uppercase tracking-wide">Acciones</th>
               </tr>
             </thead>
@@ -233,6 +253,11 @@ export default function WorkerList() {
                     <td className="px-4 py-3 text-gray-600 text-xs">{w.frente_trabajo || '—'}</td>
                     <td className="px-4 py-3 text-gray-600 text-xs">
                       {w.fecha_ingreso ? new Date(w.fecha_ingreso).toLocaleDateString('es-PE') : '—'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded ${ESTADO_STYLES[w.estado] || ESTADO_STYLES['Activo']}`}>
+                        {w.estado || 'Activo'}
+                      </span>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1">

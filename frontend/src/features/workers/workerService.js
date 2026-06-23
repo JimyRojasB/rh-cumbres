@@ -9,4 +9,5 @@ export const workerService = {
   create: (data) => api.post('/trabajadores', data).then(r => r.data),
   update: (id, data) => api.put(`/trabajadores/${id}`, data).then(r => r.data),
   delete: (id) => api.delete(`/trabajadores/${id}`).then(r => r.data),
+  updateEstado: (id, estado) => api.patch(`/trabajadores/${id}/estado`, { estado }).then(r => r.data),
 }
